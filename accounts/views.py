@@ -1,9 +1,18 @@
+# accounts/views.py
 import jwt
 import datetime
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate
 from django.conf import settings
+from django.db.models import Count, Avg
 from accounts.decorators import jwt_required
+
+# Import your models
+from students.models import Student
+from classrooms.models import ClassRoom
+from subjects.models import Subject
+from teachers.models import Teacher
+from attendances.models import Attendance
 
 
 def login_view(request):
@@ -52,20 +61,44 @@ def logout_view(request):
 
 @jwt_required
 def dashboard_view(request):
-    from students.models import Student
-    from classrooms.models import ClassRoom
-    from subjects.models import Subject
-    from teachers.models import Teacher
-    from attendances.models import Attendance
-
+    """
+    Enhanced dashboard with all the data your frontend needs.
+    """
+    # Get counts
+    total_students = Student.objects.count()
+    total_classrooms = ClassRoom.objects.count()
+    total_subjects = Subject.objects.count()
+    total_teachers = Teacher.objects.count()
+    
+    # Get recent attendance sessions
+    recent_sessions = Attendance.objects.select_related(
+        'classroom', 'subject', 'teacher'
+    ).order_by('-date')[:5]
+    
+    # Get student stats for the table
+    students = Student.objects.select_related('classroom').all()
+    
+    # Get teachers
+    teachers = Teacher.objects.prefetch_related('subjects').all()
+    
+    # Get classrooms with student counts
+    classrooms = ClassRoom.objects.annotate(
+        student_count=Count('students')
+    ).all()
+    
+    # Get attendance data for charts
+    attendance_data = []  # You'll populate this from your attendance model
+    
     context = {
-        'total_students': Student.objects.count(),
-        'total_classrooms': ClassRoom.objects.count(),
-        'total_subjects': Subject.objects.count(),
-        'total_teachers': Teacher.objects.count(),
-        'recent_sessions': Attendance.objects.select_related(
-            'classroom', 'subject', 'teacher'
-        ).order_by('-date')[:5],
         'username': request.jwt_payload['username'],
+        'total_students': total_students,
+        'total_classrooms': total_classrooms,
+        'total_subjects': total_subjects,
+        'total_teachers': total_teachers,
+        'recent_sessions': recent_sessions,
+        'students': students,
+        'teachers': teachers,
+        'classrooms': classrooms,
+        'attendance_data': attendance_data,
     }
     return render(request, 'accounts/dashboard.html', context)

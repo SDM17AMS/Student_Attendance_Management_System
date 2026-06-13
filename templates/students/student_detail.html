@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ student.full_name }} - School Management{% endblock %}
+{% block page_title %}Student Details{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ student.full_name }}</h1>
+        <p class="page-sub">Student ID: {{ student.student_id }}</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'student_edit' student.id %}" class="btn btn-primary">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a href="{% url 'student_list' %}" class="btn btn-outline">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="two-col-grid">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="bi bi-person-fill card-icon blue"></i>
+                Student Information
+            </div>
+        </div>
+        <div style="padding: 20px;">
+            <div class="detail-grid">
+                <div class="detail-row">
+                    <div class="d-label">Full Name</div>
+                    <div class="d-val">{{ student.full_name }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="d-label">Student ID</div>
+                    <div class="d-val">{{ student.student_id }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="d-label">Classroom</div>
+                    <div class="d-val">
+                        {% if student.classroom %}
+                        {{ student.classroom }}
+                        {% else %}
+                        <span style="color: var(--text-3);">Not assigned</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
