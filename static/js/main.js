@@ -1,94 +1,112 @@
-// static/js/main.js
-
-// Sidebar toggle
 document.addEventListener('DOMContentLoaded', function() {
+    // Sidebar toggle
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('sidebar');
     
-    if (sidebarToggle) {
+    if (sidebarToggle && sidebar) {
         sidebarToggle.addEventListener('click', function() {
             sidebar.classList.toggle('collapsed');
         });
     }
     
-    // Close modal
-    const modalClose = document.getElementById('modalClose');
-    const modalOverlay = document.getElementById('modalOverlay');
+    // Footer menu toggle
+    const userMenuToggle = document.getElementById('userMenuToggle');
+    const footerMenu = document.getElementById('footerMenu');
+    const userChevron = document.getElementById('userChevron');
     
-    if (modalClose) {
-        modalClose.addEventListener('click', closeModal);
+    if (userMenuToggle && footerMenu) {
+        userMenuToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isOpen = footerMenu.classList.contains('show');
+            
+            if (isOpen) {
+                userMenuToggle.classList.remove('active');
+                footerMenu.classList.remove('show');
+                if (userChevron) userChevron.classList.replace('bi-chevron-down', 'bi-chevron-up');
+            } else {
+                userMenuToggle.classList.add('active');
+                footerMenu.classList.add('show');
+                if (userChevron) userChevron.classList.replace('bi-chevron-up', 'bi-chevron-down');
+            }
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!userMenuToggle.contains(e.target) && !footerMenu.contains(e.target)) {
+                userMenuToggle.classList.remove('active');
+                footerMenu.classList.remove('show');
+                if (userChevron) userChevron.classList.replace('bi-chevron-down', 'bi-chevron-up');
+            }
+        });
     }
     
-    if (modalOverlay) {
-        modalOverlay.addEventListener('click', function(e) {
-            if (e.target === e.currentTarget) closeModal();
+    // Load dark mode preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        updateDarkModeUI(true);
+    }
+    
+    // Logout modal
+    const logoutModalOverlay = document.getElementById('logoutModalOverlay');
+    if (logoutModalOverlay) {
+        logoutModalOverlay.addEventListener('click', function(e) {
+            if (e.target === e.currentTarget) hideLogoutModal();
         });
     }
 });
 
-
-function closeModal() {
-    const modalOverlay = document.getElementById('modalOverlay');
-    if (modalOverlay) modalOverlay.classList.remove('open');
-}
-
-function openModal(title, content) {
-    const modalOverlay = document.getElementById('modalOverlay');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
+// Dark Mode
+function toggleDarkMode() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
     
-    if (modalTitle) modalTitle.textContent = title;
-    if (modalBody) modalBody.innerHTML = content;
-    if (modalOverlay) modalOverlay.classList.add('open');
+    if (isDark) {
+        html.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        updateDarkModeUI(false);
+    } else {
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        updateDarkModeUI(true);
+    }
 }
 
-// Table filter
+function updateDarkModeUI(isDark) {
+    const icon = document.getElementById('darkModeIcon');
+    const text = document.getElementById('darkModeText');
+    
+    if (icon && text) {
+        if (isDark) {
+            icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+            text.textContent = 'Light Mode';
+        } else {
+            icon.classList.replace('bi-sun-fill', 'bi-moon-fill');
+            text.textContent = 'Dark Mode';
+        }
+    }
+}
+
+function showLogoutModal() {
+    const modal = document.getElementById('logoutModalOverlay');
+    if (modal) modal.classList.add('open');
+    
+    const userMenuToggle = document.getElementById('userMenuToggle');
+    const footerMenu = document.getElementById('footerMenu');
+    const userChevron = document.getElementById('userChevron');
+    if (userMenuToggle) userMenuToggle.classList.remove('active');
+    if (footerMenu) footerMenu.classList.remove('show');
+    if (userChevron) userChevron.classList.replace('bi-chevron-down', 'bi-chevron-up');
+}
+
+function hideLogoutModal() {
+    const modal = document.getElementById('logoutModalOverlay');
+    if (modal) modal.classList.remove('open');
+}
+
 function filterTable(input, tableId) {
     const q = input.value.toLowerCase();
     const rows = document.querySelectorAll('#' + tableId + ' tbody tr');
     rows.forEach(function(row) {
         row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
     });
-}
-
-// Color generator for avatars
-const COLORS = [
-    '#4f6ef7','#22c55e','#f59e0b','#ef4444',
-    '#8b5cf6','#06b6d4','#f97316','#ec4899',
-    '#14b8a6','#6366f1','#84cc16','#e879f9'
-];
-
-function colorFor(name) {
-    let h = 0;
-    for (const c of name) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
-    return COLORS[Math.abs(h) % COLORS.length];
-}
-
-function initials(name) {
-    return name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
-}
-
-function avatarCell(name, sub) {
-    const col = colorFor(name);
-    return `
-        <div class="user-cell">
-            <div class="cell-ava" style="background:${col}">${initials(name)}</div>
-            <div>
-                <div class="cell-name">${name}</div>
-                ${sub ? `<div class="cell-email">${sub}</div>` : ''}
-            </div>
-        </div>`;
-}
-
-function pill(text, cls) {
-    return `<span class="pill ${cls}">${text}</span>`;
-}
-
-function actionBtns(viewUrl, editUrl, deleteUrl) {
-    return `
-        <div class="action-btns">
-            <a href="${viewUrl}" class="act-btn" title="View"><i class="bi bi-eye"></i></a>
-            <a href="${editUrl}" class="act-btn" title="Edit"><i class="bi bi-pencil"></i></a>
-            <a href="${deleteUrl}" class="act-btn danger" title="Delete"><i class="bi bi-trash"></i></a>
-        </div>`;
 }

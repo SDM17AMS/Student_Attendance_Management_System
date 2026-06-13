@@ -1,22 +1,13 @@
 from django import forms
 from .models import Student
 
-
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ['full_name', 'student_id', 'classroom']
-
+        fields = ['full_name', 'classroom']   # exclude student_id
+        # OR explicitly exclude:
+        # exclude = ['student_id']
         widgets = {
-            'full_name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'e.g. Seng Hok'
-            }),
-            'student_id': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'e.g. STD-2024-001'
-            }),
-            'classroom': forms.Select(attrs={
-                'class': 'form-select'
-            }),
+            'full_name': forms.TextInput(attrs={'class': 'form-input'}),
+            'classroom': forms.Select(attrs={'class': 'form-input'}),
         }

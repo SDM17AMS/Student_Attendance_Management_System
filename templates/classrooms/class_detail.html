@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ classroom }} - School Management{% endblock %}
+{% block page_title %}Class Details{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ classroom }}</h1>
+        <p class="page-sub">Classroom information and students</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'class_edit' classroom.id %}" class="btn btn-primary">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a href="{% url 'class_list' %}" class="btn btn-outline">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="two-col-grid">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="bi bi-journal-bookmark-fill card-icon blue"></i>
+                Classroom Information
+            </div>
+        </div>
+        <div style="padding: 20px;">
+            <div class="detail-grid">
+                <div class="detail-row">
+                    <div class="d-label">Name</div>
+                    <div class="d-val">{{ classroom.name }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="d-label">Section</div>
+                    <div class="d-val">
+                        {% if classroom.section %}
+                        {{ classroom.section }}
+                        {% else %}
+                        <span style="color: var(--text-3);">None</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="d-label">Total Students</div>
+                    <div class="d-val">{{ students.count }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="bi bi-people-fill card-icon green"></i>
+                Students in Class
+            </div>
+        </div>
+        <div style="padding: 20px;">
+            {% if students %}
+            <ul style="list-style: none; padding: 0;">
+                {% for student in students %}
+                <li style="padding: 8px 0; border-bottom: 1px solid var(--border-lt); display: flex; align-items: center; gap: 10px;">
+                    <div class="cell-ava" style="background: var(--blue); width: 28px; height: 28px; font-size: .6rem;">
+                        {{ student.full_name|slice:":2"|upper }}
+                    </div>
+                    <a href="{% url 'student_detail' student.id %}" style="color: var(--text-1); text-decoration: none; font-weight: 600;">
+                        {{ student.full_name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <p>No students in this class</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,32 +1,60 @@
 {% extends 'base.html' %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Login - STEP AMS{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-4">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Login</h4>
-            </div>
-            <div class="card-body">
+<div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: var(--navy);">
+    <div style="width: 100%; max-width: 420px; padding: 20px;">
+        <!-- Logo -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <a href="{% url 'dashboard' %}" style="text-decoration: none; display: inline-flex; align-items: center; gap: 16px;">
+                <div style="width: 56px; height: 56px; background: var(--blue); border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(79,110,247,.4);">
+                    <i class="bi bi-mortarboard-fill" style="font-size: 28px; color: #fff;"></i>
+                </div>
+                <div style="text-align: left;">
+                    <div style="font-size: 1.4rem; font-weight: 800; color: #fff; letter-spacing: 1px;">STEP AMS</div>
+                    <div style="font-size: .72rem; color: rgba(255,255,255,.5); letter-spacing: .15em; text-transform: uppercase;">Attendance Management</div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="card" style="border: none; box-shadow: var(--shadow-lg);">
+            <div style="padding: 32px;">
+                <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--text-1); margin-bottom: 4px; text-align: center;">Welcome Back</h2>
+                <p style="font-size: .8rem; color: var(--text-3); margin-bottom: 24px; text-align: center;">Sign in to your admin account</p>
+                
                 {% if error %}
-                    <div class="alert alert-danger">{{ error }}</div>
+                <div class="alert alert-error" style="margin-bottom: 16px;">
+                    {{ error }}
+                </div>
                 {% endif %}
+                
                 <form method="post">
                     {% csrf_token %}
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" required>
+                        <div class="search-box" style="max-width: 100%;">
+                            <i class="bi bi-person" style="color: var(--text-3);"></i>
+                            <input type="text" name="username" class="form-input" placeholder="Enter username" required style="border: none; background: transparent; width: 100%;">
+                        </div>
                     </div>
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" required>
+                        <div class="search-box" style="max-width: 100%;">
+                            <i class="bi bi-lock" style="color: var(--text-3);"></i>
+                            <input type="password" name="password" class="form-input" placeholder="Enter password" required style="border: none; background: transparent; width: 100%;">
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 8px;">
+                        <i class="bi bi-box-arrow-in-right"></i> Sign In
+                    </button>
                 </form>
             </div>
         </div>
+        
+        <p style="text-align: center; font-size: .72rem; color: rgba(255,255,255,.3); margin-top: 24px;">
+            STEP AMS - Student Attendance Management System
+        </p>
     </div>
 </div>
 {% endblock %}

@@ -4,81 +4,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}School Management System{% endblock %}</title>
+    <title>{% block title %}STEP AMS{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% if hide_sidebar %}no-sidebar{% endif %}">
 
+    {% if not hide_sidebar %}
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
-        <div class="brand">
+        <a href="{% url 'dashboard' %}" class="brand" style="text-decoration: none;">
             <div class="brand-mark"><i class="bi bi-mortarboard-fill"></i></div>
             <div class="brand-text">
-                <div class="brand-name">IT STEP ACADEMY</div>
-                <div class="brand-sub">Admin Dashboard</div>
+                <div class="brand-name">STEP AMS</div>
+                <div class="brand-sub">Attendance System</div>
             </div>
-        </div>
+        </a>
 
         <nav class="nav-section">
             <div class="nav-label">Main</div>
             <a href="{% url 'dashboard' %}" class="nav-item {% if request.path == '/dashboard/' %}active{% endif %}">
-                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                <i class="bi bi-grid-1x2-fill"></i> <span class="nav-text">Dashboard</span>
             </a>
+            
+            {% if role == 'admin' %}
             <a href="{% url 'student_list' %}" class="nav-item {% if '/students/' in request.path %}active{% endif %}">
-                <i class="bi bi-people-fill"></i> Students
+                <i class="bi bi-people-fill"></i> <span class="nav-text">Students</span>
             </a>
             <a href="{% url 'teacher_list' %}" class="nav-item {% if '/teachers/' in request.path %}active{% endif %}">
-                <i class="bi bi-person-workspace"></i> Teachers
+                <i class="bi bi-person-workspace"></i> <span class="nav-text">Teachers</span>
             </a>
             <a href="{% url 'class_list' %}" class="nav-item {% if '/classes/' in request.path %}active{% endif %}">
-                <i class="bi bi-journal-bookmark-fill"></i> Classes
+                <i class="bi bi-journal-bookmark-fill"></i> <span class="nav-text">Classes</span>
             </a>
+            {% endif %}
+            
+            {% if role == 'teacher' or role == 'admin' %}
+            <a href="{% url 'attendance_list' %}" class="nav-item {% if '/attendance/' in request.path %}active{% endif %}">
+                <i class="bi bi-calendar2-check-fill"></i> <span class="nav-text">Attendance</span>
+            </a>
+            {% endif %}
         </nav>
 
+        {% if role == 'admin' %}
         <div class="sidebar-sep"></div>
-
         <nav class="nav-section">
             <div class="nav-label">Academic</div>
             <a href="{% url 'subject_list' %}" class="nav-item {% if '/subjects/' in request.path %}active{% endif %}">
-                <i class="bi bi-book-fill"></i> Subjects
-            </a>
-            <a href="{% url 'attendance_list' %}" class="nav-item {% if '/attendance/' in request.path %}active{% endif %}">
-                <i class="bi bi-calendar2-check-fill"></i> Attendance
+                <i class="bi bi-book-fill"></i> <span class="nav-text">Subjects</span>
             </a>
         </nav>
+        {% endif %}
 
         <div class="sidebar-sep"></div>
 
-        <nav class="nav-section">
-            <div class="nav-label">Other</div>
-            <a href="{% url 'logout' %}" class="nav-item">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </a>
-        </nav>
-
         <div class="sidebar-footer">
-            <div class="user-row">
+            <div class="user-row" id="userMenuToggle">
                 <div class="u-ava">{{ username|slice:":2"|upper }}</div>
                 <div class="u-info">
                     <div class="u-name">{{ username }}</div>
-                    <div class="u-role">Super Admin</div>
+                    <div class="u-role">
+                        {% if role == 'admin' %}Super Admin
+                        {% elif role == 'teacher' %}Teacher
+                        {% else %}Student{% endif %}
+                    </div>
+                </div>
+                <i class="bi bi-chevron-up u-chevron" id="userChevron"></i>
+            </div>
+            
+            <div class="footer-menu" id="footerMenu">
+                <div class="footer-menu-inner">
+                    <a href="{% url 'dashboard' %}" class="footer-menu-item">
+                        <i class="bi bi-grid-1x2-fill"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <div class="footer-menu-sep"></div>
+                    <form method="post" action="{% url 'logout' %}" style="margin:0;">
+                        {% csrf_token %}
+                        <button type="submit" class="footer-menu-item danger" style="width:100%;border:none;background:none;cursor:pointer;">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </aside>
+    {% endif %}
 
     <!-- Main Content -->
-    <div class="main-wrap">
+    <div class="main-wrap {% if hide_sidebar %}full-width{% endif %}">
+        {% if not hide_sidebar %}
         <header class="topbar">
             <div class="topbar-left">
                 <button class="sidebar-toggle" id="sidebarToggle">
                     <i class="bi bi-list"></i>
                 </button>
                 <div class="breadcrumb">
-                    <span class="bc-root">IT STEP ACADEMY</span>
+                    <span class="bc-root">STEP AMS</span>
                     <i class="bi bi-chevron-right bc-sep"></i>
                     <span class="bc-current">{% block page_title %}Dashboard{% endblock %}</span>
                 </div>
@@ -95,6 +120,7 @@
                 <div class="topbar-avatar">{{ username|slice:":2"|upper }}</div>
             </div>
         </header>
+        {% endif %}
 
         <main class="content">
             {% if messages %}
@@ -107,17 +133,6 @@
             
             {% block content %}{% endblock %}
         </main>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal" id="modal">
-            <div class="modal-header">
-                <div class="modal-title" id="modalTitle">Detail</div>
-                <button class="modal-close" id="modalClose"><i class="bi bi-x-lg"></i></button>
-            </div>
-            <div class="modal-body" id="modalBody"></div>
-        </div>
     </div>
 
     <script src="{% static 'js/main.js' %}"></script>

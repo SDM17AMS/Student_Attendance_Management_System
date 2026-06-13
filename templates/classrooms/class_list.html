@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Classes - School Management{% endblock %}
+{% block page_title %}Classes{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Classes</h1>
+        <p class="page-sub">Manage all classrooms</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'class_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Add Class
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="toolbar">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Search classes…" oninput="filterTable(this, 'classTable')">
+            </div>
+        </div>
+    </div>
+    <table class="data-table" id="classTable">
+        <thead>
+            <tr>
+                <th>Class</th>
+                <th>Section</th>
+                <th>Students</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for classroom in classes %}
+            <tr>
+                <td>
+                    <div class="user-cell">
+                        <div class="cell-ava" style="background: var(--blue)">
+                            {{ classroom.name|slice:":2"|upper }}
+                        </div>
+                        <div>
+                            <div class="cell-name">{{ classroom.name }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    {% if classroom.section %}
+                    <span class="pill blue">{{ classroom.section }}</span>
+                    {% else %}
+                    <span style="color: var(--text-3);">—</span>
+                    {% endif %}
+                </td>
+                <td style="font-weight: 600; color: var(--text-1);">
+                    {{ classroom.students.count }}
+                </td>
+                <td>
+                    <div class="action-btns">
+                        <a href="{% url 'class_detail' classroom.id %}" class="act-btn" title="View">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'class_edit' classroom.id %}" class="act-btn" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'class_delete' classroom.id %}" class="act-btn danger" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 48px 20px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                        <i class="bi bi-inbox" style="font-size: 36px; color: var(--text-3);"></i>
+                        <p style="font-size: .82rem; color: var(--text-3);">No classes found</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

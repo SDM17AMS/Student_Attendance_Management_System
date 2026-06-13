@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from accounts.decorators import jwt_required
-from .models import Attendance
+from .models import Attendance, AttendanceRecord
 from .forms import AttendanceForm
+from students.models import Student
 
 
 @jwt_required
@@ -38,7 +39,7 @@ def attendance_detail(request, id):
         Attendance.objects.select_related('classroom', 'subject', 'teacher'),
         id=id
     )
-    records = attendance.details.select_related('student').all()
+    records = attendance.records.select_related('student').all()
     return render(request, 'attendances/attendance_detail.html', {
         'attendance': attendance,
         'records': records,
@@ -80,26 +81,37 @@ def attendance_delete(request, id):
 
 
 @jwt_required
-def attendance_mark(request, attendance_id):
-    attendance = get_object_or_404(Attendance, id=attendance_id)
-    students = attendance.classroom.students.all()
+def attendance_mark(request, pk):
+    attendance = get_object_or_404(Attendance, pk=pk)
+    students = Student.objects.filter(classroom=attendance.classroom).order_by('full_name')
 
     if request.method == 'POST':
+        # Save attendance records
         for student in students:
-            status = request.POST.get(f'status_{student.id}', 'present')
-            attendance.details.update_or_create(
-                attendance=attendance,
+            status = request.POST.get(f'status_{student.id}', 'absent')
+            AttendanceRecord.objects.update_or_create(
+                attendances=attendance,
                 student=student,
                 defaults={'status': status}
             )
-        messages.success(request, "Attendance marked.")
+        messages.success(request, "Attendance saved successfully.")
         return redirect('attendance_detail', id=attendance.id)
 
-    existing = {d.student_id: d.status for d in attendance.details.all()}
+    # GET: Build lookup and display form
+    existing_records = AttendanceRecord.objects.filter(attendances=attendance)
+    existing_statuses = {str(r.student_id): r.status for r in existing_records}
+
+    student_statuses = []
+    for student in students:
+        sid = str(student.id)
+        status = existing_statuses.get(sid, '')
+        student_statuses.append({
+            'student': student,
+            'status': status,
+        })
 
     return render(request, 'attendances/attendance_mark.html', {
         'attendance': attendance,
-        'students': students,
-        'existing': existing,
+        'student_statuses': student_statuses,
         'username': request.jwt_payload['username'],
     })

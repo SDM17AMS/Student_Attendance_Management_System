@@ -42,6 +42,13 @@ class Attendance(models.Model):
 
 # If you need to track individual students (present/absent)
 class AttendanceRecord(models.Model):
+    STATUS_CHOICES = [
+        ('present', 'Present'),
+        ('absent', 'Absent'),
+        ('late', 'Late'),
+        ('excused', 'Excused'),
+    ]
+    
     attendances = models.ForeignKey(
         Attendance,
         on_delete=models.CASCADE,
@@ -51,7 +58,7 @@ class AttendanceRecord(models.Model):
         'students.Student',
         on_delete=models.CASCADE
     )
-    is_present = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='absent')
     remarks = models.CharField(max_length=200, blank=True)
 
     class Meta:

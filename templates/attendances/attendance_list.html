@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance - School Management{% endblock %}
+{% block page_title %}Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Attendance Sessions</h1>
+        <p class="page-sub">Manage attendance records</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'attendance_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> New Session
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="toolbar">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Search sessions…" oninput="filterTable(this, 'attendanceTable')">
+            </div>
+        </div>
+    </div>
+    <table class="data-table" id="attendanceTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Classroom</th>
+                <th>Subject</th>
+                <th>Teacher</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for session in sessions %}
+            <tr>
+                <td style="font-weight: 600;">{{ session.date }}</td>
+                <td>{{ session.classroom }}</td>
+                <td>{{ session.subject }}</td>
+                <td>
+                    <div class="user-cell">
+                        <div class="cell-ava" style="background: var(--purple)">
+                            {{ session.teacher.full_name|slice:":2"|upper }}
+                        </div>
+                        <div>
+                            <div class="cell-name">{{ session.teacher.full_name }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="action-btns">
+                        <a href="{% url 'attendance_detail' session.id %}" class="act-btn" title="View">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'attendance_mark' session.id %}" class="act-btn" title="Mark Attendance" style="background: var(--green-lt); color: var(--green-dark);">
+                            <i class="bi bi-check2-all"></i>
+                        </a>
+                        <a href="{% url 'attendance_edit' session.id %}" class="act-btn" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'attendance_delete' session.id %}" class="act-btn danger" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 48px 20px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                        <i class="bi bi-inbox" style="font-size: 36px; color: var(--text-3);"></i>
+                        <p style="font-size: .82rem; color: var(--text-3);">No attendance sessions found</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

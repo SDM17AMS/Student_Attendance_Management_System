@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Record - School Management{% endblock %}
+{% block page_title %}Delete Record{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Delete Record</h1>
+        <p class="page-sub">Remove this attendance record</p>
+    </div>
+</div>
+
+<div class="card" style="max-width: 500px;">
+    <div style="padding: 24px; text-align: center;">
+        <div style="font-size: 48px; color: var(--red); margin-bottom: 16px;">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h3 style="margin-bottom: 8px; color: var(--text-1);">Delete Record?</h3>
+        <p style="color: var(--text-2); margin-bottom: 24px;">
+            {{ record.student.full_name }} | {{ record.attendance.date }} | Status: {{ record.status }}
+        </p>
+        
+        <form method="post" style="display: flex; gap: 10px; justify-content: center;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Yes, Delete
+            </button>
+            <a href="{% url 'attendance_detail' record.attendance.id %}" class="btn btn-outline">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

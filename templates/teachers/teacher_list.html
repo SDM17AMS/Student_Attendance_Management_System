@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Teachers - School Management{% endblock %}
+{% block page_title %}Teachers{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Teachers</h1>
+        <p class="page-sub">Manage teaching staff</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'teacher_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Add Teacher
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="toolbar">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Search teachers…" oninput="filterTable(this, 'teacherTable')">
+            </div>
+        </div>
+    </div>
+    <table class="data-table" id="teacherTable">
+        <thead>
+            <tr>
+                <th>Teacher</th>
+                <th>Email</th>
+                <th>Subjects</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for teacher in teachers %}
+            <tr>
+                <td>
+                    <div class="user-cell">
+                        <div class="cell-ava" data-teacher-id="{{ teacher.id }}">
+                            {{ teacher.full_name|slice:":2"|upper }}
+                        </div>
+                        <div>
+                            <div class="cell-name">{{ teacher.full_name }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>{{ teacher.email }}</td>
+                <td>
+                    {% for subject in teacher.subjects.all %}
+                    <span class="pill blue">{{ subject.name }}</span>
+                    {% empty %}
+                    <span style="color: var(--text-3);">None</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    <div class="action-btns">
+                        <a href="{% url 'teacher_detail' teacher.id %}" class="act-btn" title="View">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'teacher_edit' teacher.id %}" class="act-btn" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'teacher_delete' teacher.id %}" class="act-btn danger" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 48px 20px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                        <i class="bi bi-inbox" style="font-size: 36px; color: var(--text-3);"></i>
+                        <p style="font-size: .82rem; color: var(--text-3);">No teachers found</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

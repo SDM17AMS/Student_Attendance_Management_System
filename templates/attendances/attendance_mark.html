@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Mark Attendance - School Management{% endblock %}
+{% block page_title %}Mark Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Mark Attendance</h1>
+        <p class="page-sub">{{ attendance.date }} | {{ attendance.classroom }} | {{ attendance.subject }}</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'attendance_detail' attendance.id %}" class="btn btn-outline">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">
+            <i class="bi bi-people-fill card-icon blue"></i>
+            Students in {{ attendance.classroom }}
+        </div>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in student_statuses %}
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="cell-ava" style="background: var(--blue)">
+                                {{ item.student.full_name|slice:":2"|upper }}
+                            </div>
+                            <div>
+                                <div class="cell-name">{{ item.student.full_name }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <select name="status_{{ item.student.id }}" class="select-sm">
+                            <option value="present" {% if item.status == 'present' %}selected{% endif %}>Present</option>
+                            <option value="absent" {% if item.status == 'absent' %}selected{% endif %}>Absent</option>
+                            <option value="late" {% if item.status == 'late' %}selected{% endif %}>Late</option>
+                            <option value="excused" {% if item.status == 'excused' %}selected{% endif %}>Excused</option>
+                        </select>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" style="text-align: center; padding: 48px 20px;">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                            <i class="bi bi-inbox" style="font-size: 36px; color: var(--text-3);"></i>
+                            <p style="font-size: .82rem; color: var(--text-3);">No students in this class</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="padding: 20px; border-top: 1px solid var(--border-lt);">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-lg"></i> Save Attendance
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
