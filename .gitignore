@@ -1,13 +1,5 @@
 venv
 
-accounts/migrations
-students/migrations
-classrooms/migrations
-subjects/migrations
-teachers/migrations
-attendances/migrations
-attendance_details/migrations
-
 Student_attendance_management/__pycache__
 
 accounts/__pycache__
