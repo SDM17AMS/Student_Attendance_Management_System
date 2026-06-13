@@ -42,7 +42,7 @@ class Attendance(models.Model):
 
 # If you need to track individual students (present/absent)
 class AttendanceRecord(models.Model):
-    attendance = models.ForeignKey(
+    attendances = models.ForeignKey(
         Attendance,
         on_delete=models.CASCADE,
         related_name='records'
@@ -55,7 +55,7 @@ class AttendanceRecord(models.Model):
     remarks = models.CharField(max_length=200, blank=True)
 
     class Meta:
-        unique_together = ['attendance', 'student']
+        unique_together = ['attendances', 'student']
 
     def __str__(self):
         status = "Present" if self.is_present else "Absent"

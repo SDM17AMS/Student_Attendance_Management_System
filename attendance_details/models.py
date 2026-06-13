@@ -11,7 +11,7 @@ class AttendanceDetail(models.Model):
     ]
 
     attendance = models.ForeignKey(
-        'attendance.Attendance',
+        'attendances.Attendance',
         on_delete=models.CASCADE,
         related_name='details'
     )
