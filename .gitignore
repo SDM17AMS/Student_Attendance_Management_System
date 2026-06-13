@@ -1,1 +1,17 @@
 venv
+
+db.sqlite3
+
+accounts/migrations
+students/migrations
+classrooms/migrations
+subjects/migrations
+teachers/migrations
+attendance/migrations
+
+accounts/__pycache__
+students/__pycache__
+classrooms/__pycache__
+subjects/__pycache__
+teachers/__pycache__
+attendance/__pycache__
