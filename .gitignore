@@ -9,6 +9,8 @@ subjects/migrations
 teachers/migrations
 attendance/migrations
 
+Student_attendance_management/__pycache__
+
 accounts/__pycache__
 students/__pycache__
 classrooms/__pycache__
