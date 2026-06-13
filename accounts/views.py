@@ -16,12 +16,16 @@ from attendances.models import Attendance
 
 def get_user_role(user):
     """Determine user role based on associated models."""
-    if user.is_superuser or user.is_staff:
-        return 'admin'
-    if hasattr(user, 'teacher_profile'):
+    # Check profiles first (more specific than Django permissions)
+    if hasattr(user, 'teacher_profile') and user.teacher_profile is not None:
         return 'teacher'
-    if hasattr(user, 'student_profile'):
+    if hasattr(user, 'student_profile') and user.student_profile is not None:
         return 'student'
+    # Fallback to Django permissions
+    if user.is_superuser:
+        return 'admin'
+    if user.is_staff:
+        return 'admin'
     return 'student'
 
 
@@ -102,9 +106,20 @@ def dashboard_view(request):
     elif role == 'teacher':
         try:
             teacher = Teacher.objects.get(user_id=request.jwt_user_id)
-            total_students = Student.objects.filter(classroom__teacher=teacher).count()
-            total_classrooms = ClassRoom.objects.filter(teacher=teacher).count()
-            total_subjects = Subject.objects.filter(teacher=teacher).count()
+            
+            # Find classrooms this teacher has taken attendance for
+            teacher_classrooms = Attendance.objects.filter(
+                teacher=teacher
+            ).values_list('classroom', flat=True).distinct()
+            
+            total_students = Student.objects.filter(
+                classroom__in=teacher_classrooms
+            ).count()
+            
+            total_classrooms = teacher_classrooms.count()
+            total_subjects = Subject.objects.filter(
+                attendances__teacher=teacher
+            ).distinct().count()
             
             recent_sessions = Attendance.objects.filter(
                 teacher=teacher
@@ -166,9 +181,7 @@ def create_teacher_user(request):
             return render(request, 'accounts/create_teacher.html')
         
         user = User.objects.create_user(username=username, password=password, email=email)
-        user.is_staff = True
-        user.save()
-        
+        # Teachers are NOT staff — they are identified by Teacher profile only
         Teacher.objects.create(user=user, full_name=full_name, email=email)
         messages.success(request, f'Teacher "{full_name}" created successfully.')
         return redirect('teacher_list')

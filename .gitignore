@@ -1,7 +1,5 @@
 venv
 
-db.sqlite3
-
 accounts/migrations
 students/migrations
 classrooms/migrations
