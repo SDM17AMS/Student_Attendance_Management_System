@@ -15,8 +15,23 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-
+from django.urls import path, include
+from django.shortcuts import redirect
+ 
 urlpatterns = [
+    # Django admin panel (built-in, useful for debugging)
     path('admin/', admin.site.urls),
+ 
+    # Redirect root "/" to the dashboard
+    path('', lambda request: redirect('dashboard'), name='home'),
+ 
+    # Auth routes: login, logout  → accounts/urls.py
+    path('', include('accounts.urls')),
+ 
+    # Dashboard → accounts/urls.py handles this too (it's a shared view)
+    path('', include('students.urls')),
+    path('', include('classrooms.urls')),
+    path('', include('subjects.urls')),
+    path('', include('teachers.urls')),
+    path('', include('attendance.urls')),
 ]
