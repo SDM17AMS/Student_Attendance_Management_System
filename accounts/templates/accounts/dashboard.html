@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2>Dashboard</h2>
+<p class="text-muted">Welcome back, {{ username }}!</p>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h4>{{ total_students }}</h4>
+                <p class="mb-0">Students</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h4>{{ total_classrooms }}</h4>
+                <p class="mb-0">Classrooms</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h4>{{ total_subjects }}</h4>
+                <p class="mb-0">Subjects</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h4>{{ total_teachers }}</h4>
+                <p class="mb-0">Teachers</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mt-4">Recent Attendance Sessions</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Classroom</th>
+            <th>Subject</th>
+            <th>Teacher</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for session in recent_sessions %}
+        <tr>
+            <td>{{ session.date }}</td>
+            <td>{{ session.classroom }}</td>
+            <td>{{ session.subject }}</td>
+            <td>{{ session.teacher }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="text-center">No sessions yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
