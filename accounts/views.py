@@ -16,12 +16,10 @@ from attendances.models import Attendance
 
 def get_user_role(user):
     """Determine user role based on associated models."""
-    # Check profiles first (more specific than Django permissions)
     if hasattr(user, 'teacher_profile') and user.teacher_profile is not None:
         return 'teacher'
     if hasattr(user, 'student_profile') and user.student_profile is not None:
         return 'student'
-    # Fallback to Django permissions
     if user.is_superuser:
         return 'admin'
     if user.is_staff:
@@ -117,8 +115,10 @@ def dashboard_view(request):
             ).count()
             
             total_classrooms = teacher_classrooms.count()
+            
+            # Fix: Use 'attendance' (the default reverse FK name from Subject to Attendance)
             total_subjects = Subject.objects.filter(
-                attendances__teacher=teacher
+                attendance__teacher=teacher
             ).distinct().count()
             
             recent_sessions = Attendance.objects.filter(
@@ -142,6 +142,7 @@ def dashboard_view(request):
             student = Student.objects.get(user_id=request.jwt_user_id)
             
             from attendances.models import AttendanceRecord
+            # Use 'attendances' (the FK field name in AttendanceRecord model)
             attendance_records = AttendanceRecord.objects.filter(
                 student=student
             ).select_related('attendances__subject', 'attendances__classroom').order_by('-attendances__date')[:10]
@@ -181,7 +182,6 @@ def create_teacher_user(request):
             return render(request, 'accounts/create_teacher.html')
         
         user = User.objects.create_user(username=username, password=password, email=email)
-        # Teachers are NOT staff — they are identified by Teacher profile only
         Teacher.objects.create(user=user, full_name=full_name, email=email)
         messages.success(request, f'Teacher "{full_name}" created successfully.')
         return redirect('teacher_list')
